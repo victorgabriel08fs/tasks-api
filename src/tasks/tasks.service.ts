@@ -16,6 +16,14 @@ export class TasksService {
     return `This action returns a #${id} task`;
   }
 
+  findItem(listId: number, itemId: number) {
+    return { listId, itemId };
+  }
+
+  active() {
+    return `This action return active`;
+  }
+
   update(id: number, updateTaskDto: UpdateTaskDto) {
     return `This action updates a #${id} task`;
   }
