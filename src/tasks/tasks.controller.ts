@@ -20,13 +20,19 @@ const listQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
+const createTaskSchema = z.object({
+  title: z.string().min(3).max(120),
+  description: z.string().max(500).optional(),
+  done: z.boolean().optional(),
+});
+
 @Controller('tasks')
 @UseGuards(ApiKeyGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
+  create(@Body({ schema: createTaskSchema }) createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);
   }
 
@@ -38,8 +44,8 @@ export class TasksController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(+id);
+  findOne(@Param('id', { schema: z.uuid() }) id: string) {
+    return this.tasksService.findOne(id);
   }
 
   @Get('active')
