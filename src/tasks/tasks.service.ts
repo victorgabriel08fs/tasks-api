@@ -8,7 +8,7 @@ export class TasksService {
     return 'This action adds a new task';
   }
 
-  findAll() {
+  findAll(page: number, limit: number) {
     return `This action returns all tasks`;
   }
 
