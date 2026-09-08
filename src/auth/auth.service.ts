@@ -22,7 +22,7 @@ export class AuthService {
       data: { email, name, passwordHash: await argon2.hash(password) },
     });
 
-    return this.sign(user.id, user.email);
+    return this.sign(user.id, user.email, user?.isAdmin);
   }
 
   async login(email: string, password: string) {
@@ -33,11 +33,10 @@ export class AuthService {
       : await argon2.hash(password).then(() => false);
 
     if (!user || !ok) throw new UnauthorizedException('Credenciais inválidas');
-
-    return this.sign(user.id, user.email);
+    return this.sign(user.id, user.email, user?.isAdmin);
   }
 
-  private async sign(sub: string, email: string) {
-    return { accessToken: await this.jwt.signAsync({ sub, email }) };
+  private async sign(sub: string, email: string, isAdmin: boolean) {
+    return { accessToken: await this.jwt.signAsync({ sub, email, isAdmin }) };
   }
 }

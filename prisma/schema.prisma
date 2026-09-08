@@ -13,27 +13,28 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid()) @db.Uuid
-  email String  @unique
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
   passwordHash String
-  name String
-  tasks Task[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name         String
+  tasks        Task[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isAdmin      Boolean  @default(false)
 
   @@map("users")
 }
 
 model Task {
-  id  String @id @default(uuid()) @db.Uuid
-  title String
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
   description String?
-  done Boolean @default(false)
-  owner User @relation(fields: [ownerId],references: [id], onDelete: Cascade)
-  ownerId String @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  done        Boolean  @default(false)
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([ownerId,done])
+  @@index([ownerId, done])
   @@map("tasks")
 }

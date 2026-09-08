@@ -10,6 +10,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js
 import { JwtAuthGuard } from './auth/jwt-auth.guard.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
+import { RolesGuard } from './common/guards/roles.guard.js';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { AuthModule } from './auth/auth.module.js';
       cache: true,
       validationSchema: envSchema,
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
@@ -28,6 +31,7 @@ import { AuthModule } from './auth/auth.module.js';
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {}
