@@ -1,34 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
+import { PrismaService } from '../../prisma/prisma.service.js';
 
 @Injectable()
 export class TasksService {
-  create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(ownerId: string, dto: CreateTaskDto) {
+    return this.prisma.task.create({
+      data: { ...dto, ownerId },
+    });
   }
 
-  findAll(page: number, limit: number) {
-    return `This action returns all tasks`;
+  async findAll(ownerId: string, page: number, limit: number) {
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.task.findMany({
+        where: { ownerId },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.task.count({ where: { ownerId } }),
+    ]);
+    return {
+      items,
+      meta: { page, limit, total, pages: Math.ceil(total / limit) },
+    };
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} task`;
+  async findOne(ownerId: string, id: string) {
+    const task = await this.prisma.task.findFirst({ where: { id, ownerId } });
+    if (!task) throw new NotFoundException(`Task ${id} não encontrada`);
+    return task;
   }
 
-  findItem(listId: number, itemId: number) {
-    return { listId, itemId };
+  async update(ownerId: string, id: string, dto: UpdateTaskDto) {
+    await this.findOne(ownerId, id);
+    return this.prisma.task.update({ where: { id }, data: dto });
   }
 
-  active() {
-    return `This action return active`;
-  }
-
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(ownerId: string, id: string) {
+    await this.findOne(ownerId, id);
+    await this.prisma.task.delete({ where: { id } });
   }
 }
