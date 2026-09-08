@@ -14,6 +14,7 @@ import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { ApiKeyGuard } from '../common/guards/api-key.guard.js';
 import { z } from 'zod';
+import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 
 const listQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -32,39 +33,40 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body({ schema: createTaskSchema }) createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto);
+  create(
+    @CurrentUser('sub') userId: string,
+    @Body({ schema: createTaskSchema }) createTaskDto: CreateTaskDto,
+  ) {
+    return this.tasksService.create(userId, createTaskDto);
   }
 
   @Get()
   findAll(
+    @CurrentUser('sub') userId: string,
     @Query({ schema: listQuerySchema }) query: z.infer<typeof listQuerySchema>,
   ) {
-    return this.tasksService.findAll(query.page, query.limit);
+    return this.tasksService.findAll(userId, query.page, query.limit);
   }
 
   @Get(':id')
-  findOne(@Param('id', { schema: z.uuid() }) id: string) {
-    return this.tasksService.findOne(id);
-  }
-
-  @Get('active')
-  active() {
-    return this.tasksService.active();
-  }
-
-  @Get(':listId/items/:itemId')
-  findItem(@Param('listId') listId: string, @Param('itemId') itemId: string) {
-    return this.tasksService.findItem(+listId, +itemId);
+  findOne(
+    @CurrentUser('sub') userId: string,
+    @Param('id', { schema: z.uuid() }) id: string,
+  ) {
+    return this.tasksService.findOne(userId, id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.tasksService.update(+id, updateTaskDto);
+  update(
+    @CurrentUser('sub') userId: string,
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    return this.tasksService.update(userId, id, updateTaskDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  remove(@CurrentUser('sub') userId: string, @Param('id') id: string) {
+    return this.tasksService.remove(userId, id);
   }
 }
