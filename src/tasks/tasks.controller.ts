@@ -16,7 +16,10 @@ import { ApiKeyGuard } from '../common/guards/api-key.guard.js';
 import { z } from 'zod';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { listQuerySchema } from '../utils/list-query.schema.js';
+import {
+  listTasksQuerySchema,
+  type ListTasksQuery,
+} from './dto/list-tasks-query.dto.js';
 
 const createTaskSchema = z.object({
   title: z.string().min(3).max(120),
@@ -44,7 +47,7 @@ export class TasksController {
   @ApiOperation({ summary: 'Lista as tarefas do usuário atual' })
   findAll(
     @CurrentUser('sub') userId: string,
-    @Query({ schema: listQuerySchema }) query: z.infer<typeof listQuerySchema>,
+    @Query({ schema: listTasksQuerySchema }) query: ListTasksQuery,
   ) {
     return this.tasksService.findAll(userId, query);
   }

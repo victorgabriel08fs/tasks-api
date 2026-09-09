@@ -12,8 +12,10 @@ import { UsersService } from './users.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { Role, Roles } from '../common/decorators/roles.decorator.js';
-import { listQuerySchema } from '../utils/list-query.schema.js';
-import z from 'zod';
+import {
+  listUsersQuerySchema,
+  type ListUsersQuery,
+} from './dto/list-users-query.dto.js';
 
 @Controller('users')
 export class UsersController {
@@ -27,7 +29,7 @@ export class UsersController {
   @Get()
   @Roles(Role.Admin)
   findAll(
-    @Query({ schema: listQuerySchema }) query: z.infer<typeof listQuerySchema>,
+    @Query({ schema: listUsersQuerySchema }) query: ListUsersQuery,
   ) {
     return this.usersService.findAll(query);
   }

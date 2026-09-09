@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { ListQuery } from '../utils/list-query.schema.js';
+import type { ListTasksQuery } from './dto/list-tasks-query.dto.js';
 
 @Injectable()
 export class TasksService {
@@ -14,11 +14,13 @@ export class TasksService {
     });
   }
 
-  async findAll(ownerId: string, query: ListQuery) {
+  async findAll(ownerId: string, query: ListTasksQuery) {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.task.findMany({
         where: { ownerId },
-        orderBy: { createdAt: 'desc' },
+        orderBy: query.sortBy
+          ? { [query.sortBy]: query.direction }
+          : { createdAt: 'desc' },
         skip: (query.page - 1) * query.limit,
         take: query.limit,
       }),
