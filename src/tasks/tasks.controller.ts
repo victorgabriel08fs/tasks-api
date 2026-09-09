@@ -15,6 +15,7 @@ import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { ApiKeyGuard } from '../common/guards/api-key.guard.js';
 import { z } from 'zod';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 const listQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -33,6 +34,9 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Cria uma tarefa' })
+  @ApiResponse({ status: 201, description: 'Tarefa criada' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
   create(
     @CurrentUser('sub') userId: string,
     @Body({ schema: createTaskSchema }) createTaskDto: CreateTaskDto,
@@ -41,6 +45,7 @@ export class TasksController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Lista as tarefas do usuário atual' })
   findAll(
     @CurrentUser('sub') userId: string,
     @Query({ schema: listQuerySchema }) query: z.infer<typeof listQuerySchema>,
@@ -49,6 +54,7 @@ export class TasksController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Encontra uma tarefa específica do usuário atual' })
   findOne(
     @CurrentUser('sub') userId: string,
     @Param('id', { schema: z.uuid() }) id: string,
@@ -57,6 +63,7 @@ export class TasksController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza uma tarefa específica do usuário atual' })
   update(
     @CurrentUser('sub') userId: string,
     @Param('id') id: string,
@@ -66,6 +73,7 @@ export class TasksController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Deleta uma tarefa específica do usuário atual' })
   remove(@CurrentUser('sub') userId: string, @Param('id') id: string) {
     return this.tasksService.remove(userId, id);
   }

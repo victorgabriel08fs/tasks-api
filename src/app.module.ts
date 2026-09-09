@@ -25,7 +25,6 @@ import { RolesGuard } from './common/guards/roles.guard.js';
     }),
     UsersModule,
   ],
-  controllers: [AppController],
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

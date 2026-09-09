@@ -15,15 +15,19 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('Tasks API')
-    .setDescription('API de tarefas — curso de NestJS')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  SwaggerModule.setup('docs', app, () =>
-    SwaggerModule.createDocument(app, config),
-  );
+  const env = process?.env?.NODE_ENV ?? null;
+
+  if (env === 'development') {
+    const config = new DocumentBuilder()
+      .setTitle('Tasks API')
+      .setDescription('API de tarefas — curso de NestJS')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    SwaggerModule.setup('docs', app, () =>
+      SwaggerModule.createDocument(app, config),
+    );
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
