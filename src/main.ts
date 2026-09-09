@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
-import { StandardSchemaValidationPipe, ValidationPipe } from '@nestjs/common';
+import {
+  StandardSchemaValidationPipe,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -14,6 +18,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
 
   const env = process?.env?.NODE_ENV ?? null;
 
