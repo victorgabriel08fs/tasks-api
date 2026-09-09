@@ -16,11 +16,7 @@ import { ApiKeyGuard } from '../common/guards/api-key.guard.js';
 import { z } from 'zod';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-
-const listQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-});
+import { listQuerySchema } from '../utils/list-query.schema.js';
 
 const createTaskSchema = z.object({
   title: z.string().min(3).max(120),
@@ -50,7 +46,7 @@ export class TasksController {
     @CurrentUser('sub') userId: string,
     @Query({ schema: listQuerySchema }) query: z.infer<typeof listQuerySchema>,
   ) {
-    return this.tasksService.findAll(userId, query.page, query.limit);
+    return this.tasksService.findAll(userId, query);
   }
 
   @Get(':id')
