@@ -4,6 +4,9 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import type { ListUsersQuery } from './dto/list-users-query.dto.js';
+import { ListResponse } from '../utils/list-response.schema.js';
+import { User } from './entities/user.entity.js';
+import { NativeUser } from './entities/native-user.entity.js';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +15,7 @@ export class UsersService {
   //   return 'This action adds a new user';
   // }
 
-  async findAll(query: ListUsersQuery) {
+  async findAll(query: ListUsersQuery): Promise<ListResponse<NativeUser>> {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
         orderBy: query.sortBy
@@ -34,6 +37,12 @@ export class UsersService {
         limit: query.limit,
         total,
         pages: Math.ceil(total / query.limit),
+        sortBy: query?.sortBy
+          ? {
+              key: query.sortBy,
+              direction: query.direction,
+            }
+          : {},
       },
     };
   }

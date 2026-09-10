@@ -3,6 +3,8 @@ import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { ListTasksQuery } from './dto/list-tasks-query.dto.js';
+import { ListResponse } from '../utils/list-response.schema.js';
+import { NativeTask } from './entities/native-task.entity.js';
 
 @Injectable()
 export class TasksService {
@@ -14,7 +16,10 @@ export class TasksService {
     });
   }
 
-  async findAll(ownerId: string, query: ListTasksQuery) {
+  async findAll(
+    ownerId: string,
+    query: ListTasksQuery,
+  ): Promise<ListResponse<NativeTask>> {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.task.findMany({
         where: { ownerId },
@@ -36,6 +41,12 @@ export class TasksService {
         limit: query.limit,
         total,
         pages: Math.ceil(total / query.limit),
+        sortBy: query?.sortBy
+          ? {
+              key: query.sortBy,
+              direction: query.direction,
+            }
+          : {},
       },
     };
   }
