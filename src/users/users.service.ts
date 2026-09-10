@@ -6,7 +6,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import type { ListUsersQuery } from './dto/list-users-query.dto.js';
 import { ListResponse } from '../utils/list-response.schema.js';
 import { User } from './entities/user.entity.js';
-import { NativeUser } from './entities/native-user.entity.js';
+import { NativeUser } from './entities/user.entity.js';
 
 @Injectable()
 export class UsersService {

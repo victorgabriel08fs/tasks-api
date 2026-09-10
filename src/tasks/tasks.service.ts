@@ -4,7 +4,7 @@ import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { ListTasksQuery } from './dto/list-tasks-query.dto.js';
 import { ListResponse } from '../utils/list-response.schema.js';
-import { NativeTask } from './entities/native-task.entity.js';
+import { NativeTask } from './entities/task.entity.js';
 
 @Injectable()
 export class TasksService {
