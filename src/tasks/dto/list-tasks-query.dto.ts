@@ -6,6 +6,9 @@ export const listTasksQuerySchema = createListQuerySchema([
   'done',
   'createdAt',
   'updatedAt',
+], [
+  'title',
+  'description',
 ]);
 
 export type ListTasksQuery = z.infer<typeof listTasksQuerySchema>;

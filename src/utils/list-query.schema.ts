@@ -8,21 +8,25 @@ export const sortDirectionSchema = z
   .default('asc');
 
 export type SortDirection = z.infer<typeof sortDirectionSchema>;
-
 export function createListQuerySchema<
   const T extends readonly [string, ...string[]],
->(sortableKeys: T) {
+  const U extends readonly [string, ...string[]],
+>(sortableKeys: T, searchableKeys: U) {
   return z.object({
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(100).default(20),
     sortBy: z.enum(sortableKeys).optional(),
     direction: sortDirectionSchema,
+    searchField: z.enum(searchableKeys).optional(),
+    search: z.string().optional(),
   });
 }
 
-export interface ListQuery<TSortKey extends string = string> {
+export interface ListQuery<TSortKey extends string = string, TSearchkey extends string = string> {
   page: number;
   limit: number;
   sortBy?: TSortKey;
   direction: SortDirection;
+  searchField?: TSearchkey;
+  search?: string;
 }

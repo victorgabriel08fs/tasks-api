@@ -18,13 +18,24 @@ export class UsersService {
   async findAll(query: ListUsersQuery): Promise<ListResponse<NativeUser>> {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
+        where: {
+          ...(query.searchField && query.search
+            ? { [query.searchField]: { contains: query.search, mode: 'insensitive' } }
+            : {}),
+        },
         orderBy: query.sortBy
           ? { [query.sortBy]: query.direction }
           : { createdAt: 'desc' },
         skip: (query.page - 1) * query.limit,
         take: query.limit,
       }),
-      this.prisma.user.count(),
+      this.prisma.user.count({
+        where: {
+          ...(query.searchField && query.search
+            ? { [query.searchField]: { contains: query.search, mode: 'insensitive' } }
+            : {}),
+        },
+      }),
     ]);
 
     return {
@@ -43,6 +54,13 @@ export class UsersService {
               direction: query.direction,
             }
           : {},
+        search:
+          query?.searchField && query?.search
+            ? {
+                field: query.searchField,
+                value: query.search,
+              }
+            : {},
       },
     };
   }

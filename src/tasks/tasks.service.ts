@@ -22,14 +22,26 @@ export class TasksService {
   ): Promise<ListResponse<NativeTask>> {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.task.findMany({
-        where: { ownerId },
+        where: {
+          ownerId,
+          ...(query.searchField && query.search
+            ? { [query.searchField]: { contains: query.search, mode: 'insensitive' } }
+            : {}),
+        },
         orderBy: query.sortBy
           ? { [query.sortBy]: query.direction }
           : { createdAt: 'desc' },
         skip: (query.page - 1) * query.limit,
         take: query.limit,
       }),
-      this.prisma.task.count({ where: { ownerId } }),
+      this.prisma.task.count({
+        where: {
+          ownerId,
+          ...(query.searchField && query.search
+            ? { [query.searchField]: { contains: query.search, mode: 'insensitive' } }
+            : {}),
+        },
+      }),
     ]);
     return {
       items,
@@ -47,6 +59,13 @@ export class TasksService {
               direction: query.direction,
             }
           : {},
+        search:
+          query?.searchField && query?.search
+            ? {
+                field: query.searchField,
+                value: query.search,
+              }
+            : {},
       },
     };
   }
